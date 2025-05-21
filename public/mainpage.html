@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TextIT Chat UI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+  <link rel="icon" href="data:,">
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="h-screen font-sans bg-white text-black dark:bg-[#2c2f33] dark:text-white transition-colors">
+
+  <div class="flex h-full">
+
+    
+    <!-- Sidebar -->
+<aside class="w-1/4 bg-gray-100 dark:bg-[#2b2d31] overflow-y-auto">
+  <div class="p-4 font-bold text-xl border-b border-gray-300 dark:border-[#4f545c]">TextIT</div>
+  <input
+    type="text"
+    placeholder="Search Here..."
+    class="w-full px-4 py-2 border-b text-black dark:text-white dark:bg-[#40444b]"
+    id="user-search"
+  />
+
+  <ul id="users-list" class="divide-y divide-gray-300 dark:divide-[#4f545c]">
+    <!-- Users will be dynamically inserted here -->
+  </ul>
+</aside>
+
+
+    <!-- Chat Area -->
+    <main class="flex-1 flex flex-col bg-white dark:bg-[#2c2f33]">
+      <!-- Chat Header (dynamic) -->
+<div id="chat-header" class="flex items-center justify-between p-4 bg-gray-200 dark:bg-[#292b2f] border-b dark:border-[#4f545c]">
+  <div>
+    <h2 id="chatting-with" class="font-semibold text-gray-800 dark:text-white">
+      Chatting with <span class="font-bold" id="chat-user-name">Select a user</span>
+      <span class="text-green-500 text-xs">●</span>
+    </h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Online</p>
+    <p id="typing-indicator" class="text-xs text-gray-500 dark:text-gray-400 mt-1"></p>
+
+  </div>
+  <div class="flex space-x-4 items-center">
+    <button id="theme-toggle" class="px-3 py-1 text-sm rounded bg-gray-300 dark:bg-gray-700 text-black dark:text-white">
+      🔆/☽
+    </button>
+  </div>
+</div>
+
+
+      <!-- Chat Messages -->
+      <div id="message-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+        <div class="text-center text-xs text-gray-400 dark:text-gray-500">Today</div>
+        <!-- Messages will be appended here -->
+      </div>
+
+      <!-- Message Input -->
+      <div class="flex items-center p-4 border-t bg-gray-100 dark:bg-[#2f3136] dark:border-[#4f545c]">
+        <input id="message-input" type="text" placeholder="Message..." class="flex-1 px-4 py-2 border rounded-full text-black dark:text-white bg-gray-200 dark:bg-[#40444b] focus:outline-none"/>
+        <div class="flex items-center ml-4 space-x-3 text-gray-500">
+          <button>📎</button>
+          <button>📷</button>
+          <button id="send-btn" class="text-[#7289da] hover:text-[#5a6cb1] font-bold">➤</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Panel -->
+<aside class="w-1/4 bg-gray-100 dark:bg-[#2b2d31] p-4 hidden md:block">
+  <div class="text-center">
+    <h3 id="current-user" class="font-bold text-xl mb-1">Person 2</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Active Now</p>
+
+    <div class="space-y-2">
+      <button class="w-full py-2 bg-[#7289da] hover:bg-[#5a6cb1] text-white rounded transition">Chat</button>
+      <button class="w-full py-2 bg-gray-300 hover:bg-gray-400 dark:bg-[#40444b] dark:hover:bg-[#36393f] text-black dark:text-white rounded transition">Video Call</button>
+    </div>
+
+    <hr class="my-6 border-gray-300 dark:border-[#4f545c]" />
+
+    <div class="text-left">
+      <p class="text-sm font-semibold mb-2">Quick Actions</p>
+      <div class="grid grid-cols-1 gap-2 text-sm">
+        <button class="w-full bg-gray-300 hover:bg-gray-400 dark:bg-[#40444b] dark:hover:bg-[#36393f] py-2 rounded">Document</button>
+        <button class="w-full bg-gray-300 hover:bg-gray-400 dark:bg-[#40444b] dark:hover:bg-[#36393f] py-2 rounded">Image</button>
+      </div>
+    </div>
+
+    <!-- ✅ Logout Button -->
+    <div class="mt-6">
+      <button id="logout-btn" class="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded transition">
+        Logout
+      </button>
+    </div>
+  </div>
+</aside>
+
+
+  </div>
+
+  
+  <script src="chat.js"></script>
+</body>
+</html>
