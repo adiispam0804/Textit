@@ -42,3 +42,30 @@ Edit
   ├── chat.js             # JS for chat UI + socket client
 /server.js                # Backend server with API and socket handling
 /textit.db                # SQLite database file (auto-generated)
+
+
+Usage
+First, register a new user on the registration page.
+
+After registration, you can login with your credentials.
+
+Chat with other online users in real-time.
+
+Toggle dark mode using the button on any page.
+
+Refreshing the page maintains your theme preference.
+
+To-Do / Future Improvements
+User profile customization (avatars, status, etc.)
+
+Message timestamps and read receipts
+
+Group chat functionality
+
+Deploy to production environment with persistent storage and SSL
+
+Add password reset functionality
+
+License
+This project is open-source and free to use.
+
