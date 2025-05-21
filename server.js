@@ -6,7 +6,7 @@ import sqlite3 from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
-import open from 'open';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const server = http.createServer(app);
@@ -94,7 +94,7 @@ app.post('/api/messages', (req, res) => {
   res.json({ success: true });
 });
 
-// --- Sockets ---
+// --- Socket.io ---
 let onlineUsers = new Map();
 
 io.on('connection', (socket) => {
@@ -132,6 +132,4 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  open(`http://localhost:${PORT}/register.html`);
 });
-

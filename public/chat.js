@@ -1,6 +1,11 @@
 const username = localStorage.getItem("username") || "Guest";
 let selectedUser = localStorage.getItem("selectedUser") || null;
-const socket = io("http://localhost:3000", {
+
+const backendURL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://textit-aaj7.onrender.com';
+
+const socket = io(backendURL, {
   query: { username },
 });
 
@@ -59,7 +64,7 @@ sendButton?.addEventListener("click", async () => {
   inputField.value = "";
 
   try {
-    const res = await fetch("http://localhost:3000/api/messages", {
+    const res = await fetch(`${backendURL}/api/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(message),
@@ -72,7 +77,6 @@ sendButton?.addEventListener("click", async () => {
     console.error("Error saving message:", error);
   }
 });
-
 
 // Typing
 inputField.addEventListener("input", () => {
@@ -105,103 +109,90 @@ socket.on("typing", (from) => {
 // Update user list
 socket.on("user-list", (users) => {
   allUsers = users.filter((u) => u !== username);
-  renderUsersList(allUsers);
-
-  if (allUsers.length > 0 && !selectedUser) {
-    document.querySelector("#users-list li")?.click();
-  }
+  renderUserList(allUsers);
 });
 
 // Render user list
-function renderUsersList(users) {
+function renderUserList(users) {
   usersList.innerHTML = "";
-  if (users.length === 0) {
-    usersList.innerHTML = '<li class="p-4 text-gray-500 dark:text-gray-400">No users online</li>';
-    return;
-  }
-
   users.forEach((user) => {
     const li = document.createElement("li");
-    li.className =
-      "p-4 hover:bg-gray-200 dark:hover:bg-[#3a3f47] cursor-pointer border-b border-gray-300 dark:border-[#4f545c]";
-    li.innerHTML = `
-      <div>
-        <div class="font-semibold">${user}</div>
-        <div class="text-sm text-gray-500 dark:text-gray-400">Online</div>
-      </div>
-    `;
+    li.textContent = user;
+    li.classList.add("cursor-pointer", "p-2", "hover:bg-gray-200", "dark:hover:bg-gray-700");
+
+    if (user === selectedUser) {
+      li.classList.add("font-bold");
+    }
 
     li.addEventListener("click", () => {
       selectedUser = user;
-      localStorage.setItem("selectedUser", user);
-      chatUserNameEl.textContent = user;
-      messageContainer.innerHTML = "";
+      localStorage.setItem("selectedUser", selectedUser);
+      chatUserNameEl.textContent = selectedUser;
       fetchChatHistory();
     });
-
     usersList.appendChild(li);
   });
 }
 
-// Search users
-userSearchInput.addEventListener("input", (e) => {
-  const searchTerm = e.target.value.toLowerCase();
-  const filtered = allUsers.filter((user) => user.toLowerCase().includes(searchTerm));
-  renderUsersList(filtered);
-});
-
-// Fetch chat history
+// Fetch chat history for selected user
 async function fetchChatHistory() {
-  try {
-    const response = await fetch("http://localhost:3000/api/messages");
-    const messages = await response.json();
+  if (!selectedUser) return;
 
-    const filtered = messages.filter(
-      (msg) =>
-        (msg.from_user === username && msg.to_user === selectedUser) ||
-        (msg.from_user === selectedUser && msg.to_user === username)
+  try {
+    const res = await fetch(`${backendURL}/api/messages`);
+    if (!res.ok) throw new Error('Failed to fetch messages');
+
+    const messages = await res.json();
+
+    const filteredMessages = messages.filter(
+      (m) =>
+        (m.from_user === username && m.to_user === selectedUser) ||
+        (m.from_user === selectedUser && m.to_user === username)
     );
 
-    filtered.forEach(({ from_user, text, timestamp }) => {
-      appendMessage(from_user === username ? "You" : from_user, text, timestamp);
+    messageContainer.innerHTML = "";
+
+    filteredMessages.forEach((msg) => {
+      const sender = msg.from_user === username ? "You" : msg.from_user;
+      appendMessage(sender, msg.text, msg.timestamp);
     });
 
     scrollToBottom();
   } catch (error) {
-    console.error("Error loading messages:", error);
+    console.error("Error fetching messages:", error);
   }
 }
 
+// Append message to chat container
+function appendMessage(sender, text, timestamp = null) {
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add("message", "mb-2");
 
-function appendMessage(sender, message, timestamp = null) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "flex flex-col";
-
-  // If no timestamp passed, use current local time
-  let timeStr;
-  if (timestamp) {
-    // Parse the UTC timestamp string as Date, then convert to local time string
-    const utcDate = new Date(timestamp + "Z"); // Add 'Z' to mark as UTC if missing
-    timeStr = utcDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // Style differently for You vs others
+  if (sender === "You") {
+    messageDiv.classList.add("text-right", "text-blue-600");
   } else {
-    timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    messageDiv.classList.add("text-left", "text-gray-800");
   }
 
-  const div = document.createElement("div");
-  div.className = `max-w-[70%] px-4 py-2 rounded-lg text-sm ${
-    sender === "You"
-      ? "self-end bg-[#7289da] text-white ml-auto"
-      : "self-start bg-[#4f545c] text-white mr-auto"
-  }`;
+  // Format timestamp
+  let timeString = "";
+  if (timestamp) {
+    const date = new Date(timestamp);
+    timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
 
-  div.innerHTML = `<strong>${sender}</strong> <span class="text-xs text-gray-300">(${timeStr})</span><br>${message}`;
+  messageDiv.innerHTML = `
+    <strong>${sender}</strong>: ${text} 
+    <span class="text-xs text-gray-400 ml-2">${timeString}</span>
+  `;
 
-  wrapper.appendChild(div);
-  messageContainer.appendChild(wrapper);
+  messageContainer.appendChild(messageDiv);
   scrollToBottom();
 }
 
-
+// Auto-scroll chat to bottom
 function scrollToBottom() {
   messageContainer.scrollTop = messageContainer.scrollHeight;
 }
+

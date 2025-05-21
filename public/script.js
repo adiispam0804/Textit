@@ -3,6 +3,11 @@ const passwordInput = document.getElementById('password');
 const loginForm = document.getElementById('login-form');
 const themeToggle = document.getElementById('theme-toggle');
 
+// Dynamically set backend URL for fetch
+const backendURL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://textit-aaj7.onrender.com';
+
 window.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
@@ -32,8 +37,7 @@ if (loginForm) {
     }
 
     try {
-      // Explicitly use backend URL
-      const res = await fetch('http://localhost:3000/login', {
+      const res = await fetch(`${backendURL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
