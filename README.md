@@ -28,7 +28,7 @@ Frontend: HTML, CSS, Tailwind CSS, JavaScript
 
 Database: SQLite
 
-Deployment: Local server (can be deployed on platforms like Render)
+Deployment: Render
 
 Project Structure
 bash
