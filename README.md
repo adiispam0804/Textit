@@ -1,7 +1,7 @@
 # Textit
 TextIT - Real-Time Chat Application
 TextIT is a real-time chat web application built using Node.js, Express, Socket.IO, SQLite, and Tailwind CSS. It supports user registration, secure login with hashed passwords, real-time messaging, dark mode toggle, and responsive UI inspired by Discord’s look and feel.
-
+LIVE LINK --  https://textit-aaj7.onrender.com
 Features
 User Authentication
 Secure registration and login with bcrypt password hashing stored in SQLite database.
